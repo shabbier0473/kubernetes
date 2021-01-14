@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: msa
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/actions.msa-2: >
+            {"type":"forward","targetGroupARN": "arn:aws:elasticloadbalancing:us-east-1:955470930558:targetgroup/k8s-default-msa2-be6b76d2cd/5aabfcf1c8fff869"}
+    alb.ingress.kubernetes.io/conditions.msa-2: >
+      [{"field":"http-header","httpHeaderConfig":{"httpHeaderName": "team", "values":["sqe"]}}]
+spec:
+  rules:
+    - http:
+        paths:
+          - backend:
+              serviceName: msa-2
+              servicePort: use-annotation
+          - path: /*
+            backend:
+              serviceName: msa-1
+              servicePort: 3001
+          - path: /*
+            backend:
+              serviceName: msa-2
+              servicePort: 3001

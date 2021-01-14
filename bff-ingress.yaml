@@ -1,0 +1,27 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: bff
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/actions.bff-2: >
+            {"type":"forward","targetGroupARN": "arn:aws:elasticloadbalancing:us-east-1:955470930558:targetgroup/k8s-default-bff2-e851df66a1/8a266a54c49f309b"}
+    alb.ingress.kubernetes.io/conditions.bff-2: >
+      [{"field":"http-header","httpHeaderConfig":{"httpHeaderName": "team", "values":["sqe"]}}]
+spec:
+  rules:          
+    - http:
+        paths:
+          - backend:
+              serviceName: bff-2
+              servicePort: use-annotation
+          - path: /*
+            backend:
+              serviceName: bff-1
+              servicePort: 3002
+          - path: /*
+            backend:
+              serviceName: bff-2
+              servicePort: 3002
