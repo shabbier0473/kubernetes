@@ -1,0 +1,13 @@
+aws-calico
+aws-cloudwatch-metrics
+aws-load-balancer-controller
+aws-vpc-cni
+appmesh-inject
+appmesh-gateway
+appmesh-grafana
+appmesh-jaeger
+appmesh-prometheus
+aws-for-fluent-bit
+aws-node-termination-handler
+aws-sigv4-proxy-admission-controller
+appmesh-controller

@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  namespace: default
+  name: ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/actions.rule-path1: >
+      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"200","messageBody":"Host is www.example.com OR anno.example.com"}}
+    alb.ingress.kubernetes.io/conditions.rule-path1: >
+      [{"field":"host-header","hostHeaderConfig":{"values":["anno.example.com"]}}]
+    alb.ingress.kubernetes.io/actions.rule-path2: >
+      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"200","messageBody":"Path is /path2 OR /anno/path2"}}
+    alb.ingress.kubernetes.io/conditions.rule-path2: >
+      [{"field":"path-pattern","pathPatternConfig":{"values":["/anno/path2"]}}]
+    alb.ingress.kubernetes.io/actions.rule-path3: >
+      {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"200","messageBody":"Http header HeaderName is HeaderValue1 OR HeaderValue2"}}
+    alb.ingress.kubernetes.io/conditions.rule-path3: >
+      [{"field":"http-header","httpHeaderConfig":{"httpHeaderName": "HeaderName", "values":["HeaderValue1", "HeaderValue2"]}}]
+    alb.ingress.kubernetes.io/actions.rule-path8: >
+            {"type":"fixed-response","fixedResponseConfig":{"contentType":"text/plain","statusCode":"200","messageBody":"multiple conditions applies"}}
+    alb.ingress.kubernetes.io/conditions.rule-path8: >
+            [{"field":"http-header","httpHeaderConfig":{"httpHeaderName": "HeaderName", "values":["HeaderValue"]}},{"field":"query-string","queryStringConfig":{"values":[{"key":"paramA","value":"valueA"}]}},{"field":"query-string","queryStringConfig":{"values":[{"key":"paramB","value":"valueB"}]}}]
+spec:
+  rules:
+    http:
+        paths:
+          - path: /path1
+            backend:
+              serviceName: rule-path1
+              servicePort: use-annotation
+          - path: /path2
+            backend:
+              serviceName: rule-path2
+              servicePort: use-annotation
+          - path: /path3
+            backend:
+              serviceName: rule-path3
+              servicePort: use-annotation
+          - backend:
+              serviceName: rule-path8
+              servicePort: use-annotation    
